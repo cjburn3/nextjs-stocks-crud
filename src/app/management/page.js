@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
+import { getAlllDocuments } from "@/utils/firebaseConfig.js";
 
 let initialStocks = [
   { id: 1, name: 'Apple Inc.', symbol: 'AAPL', price: 142.02 },
