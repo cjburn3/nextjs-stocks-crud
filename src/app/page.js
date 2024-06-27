@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from '../../utils/firebaseConfig';
 
 const stocks = [
   { id: 1, name: 'Apple Inc.', symbol: 'AAPL', price: 142.02 },
