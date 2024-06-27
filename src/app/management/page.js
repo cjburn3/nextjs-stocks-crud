@@ -1,17 +1,10 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { getAllDocuments } from "@/utils/firebaseConfig.js";
-import { db } from '../../firebaseConfig';
-
-let initialStocks = [
-  { id: 1, name: 'Apple Inc.', symbol: 'AAPL', price: 142.02 },
-  { id: 2, name: 'Microsoft Corporation', symbol: 'MSFT', price: 277.01 },
-  { id: 3, name: 'Amazon.com Inc.', symbol: 'AMZN', price: 3458.50 },
-];
+import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "@/utils/firebaseConfig";
 
 export default function Management() {
-  const [stocks, setStocks] = useState(initialStocks);
+  const [stocks, setStocks] = useState([]);
   const [newStockName, setNewStockName] = useState('');
   const [newStockSymbol, setNewStockSymbol] = useState('');
   const [newStockPrice, setNewStockPrice] = useState('');
@@ -20,27 +13,40 @@ export default function Management() {
   const [editStockSymbol, setEditStockSymbol] = useState('');
   const [editStockPrice, setEditStockPrice] = useState('');
 
-  const handleAddStock = () => {
+  useEffect(() => {
+    fetchStocks();
+  }, []);
+
+  const fetchStocks = async () => {
+    const querySnapshot = await getDocs(collection(db, "stocks"));
+    const stocksData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    setStocks(stocksData);
+  };
+
+  const handleAddStock = async () => {
     if (newStockName.trim() !== '' && newStockSymbol.trim() !== '' && newStockPrice.trim() !== '') {
       const newStock = {
-        id: stocks.length + 1,
         name: newStockName,
         symbol: newStockSymbol,
         price: parseFloat(newStockPrice),
       };
-      setStocks([...stocks, newStock]);
+      await addDoc(collection(db, "stocks"), newStock);
+      fetchStocks();
       setNewStockName('');
       setNewStockSymbol('');
       setNewStockPrice('');
     }
   };
 
-  const handleEditStock = () => {
+  const handleEditStock = async () => {
     if (editStockId !== null && editStockName.trim() !== '' && editStockSymbol.trim() !== '' && editStockPrice.trim() !== '') {
-      const updatedStocks = stocks.map((stock) =>
-        stock.id === editStockId ? { ...stock, name: editStockName, symbol: editStockSymbol, price: parseFloat(editStockPrice) } : stock
-      );
-      setStocks(updatedStocks);
+      const stockRef = doc(db, "stocks", editStockId);
+      await updateDoc(stockRef, {
+        name: editStockName,
+        symbol: editStockSymbol,
+        price: parseFloat(editStockPrice),
+      });
+      fetchStocks();
       setEditStockId(null);
       setEditStockName('');
       setEditStockSymbol('');
@@ -48,9 +54,10 @@ export default function Management() {
     }
   };
 
-  const handleDeleteStock = (id) => {
-    const updatedStocks = stocks.filter((stock) => stock.id !== id);
-    setStocks(updatedStocks);
+  const handleDeleteStock = async (id) => {
+    const stockRef = doc(db, "stocks", id);
+    await deleteDoc(stockRef);
+    fetchStocks();
   };
 
   const handleSetEditStock = (stock) => {
