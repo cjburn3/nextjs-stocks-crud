@@ -4,8 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { getAllDocuments } from "@/utils/firebaseConfig.js";
 import { db } from '../../firebaseConfig';
 
+let initialStocks = [
+  { id: 1, name: 'Apple Inc.', symbol: 'AAPL', price: 142.02 },
+  { id: 2, name: 'Microsoft Corporation', symbol: 'MSFT', price: 277.01 },
+  { id: 3, name: 'Amazon.com Inc.', symbol: 'AMZN', price: 3458.50 },
+];
+
 export default function Management() {
-  const [stocks, setStocks] = useState([]);
+  const [stocks, setStocks] = useState(initialStocks);
   const [newStockName, setNewStockName] = useState('');
   const [newStockSymbol, setNewStockSymbol] = useState('');
   const [newStockPrice, setNewStockPrice] = useState('');
@@ -14,74 +20,37 @@ export default function Management() {
   const [editStockSymbol, setEditStockSymbol] = useState('');
   const [editStockPrice, setEditStockPrice] = useState('');
 
-  useEffect(() => {
-    // Fetch initial stocks from Firestore on component mount
-    fetchStocks();
-  }, []);
-
-  const fetchStocks = async () => {
-    try {
-      const snapshot = await getAllDocuments(db.collection('stocks'));
-      const stocksData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setStocks(stocksData);
-    } catch (error) {
-      console.error('Error fetching stocks: ', error);
-    }
-  };
-
-  const handleAddStock = async () => {
+  const handleAddStock = () => {
     if (newStockName.trim() !== '' && newStockSymbol.trim() !== '' && newStockPrice.trim() !== '') {
-      try {
-        const newStock = {
-          name: newStockName,
-          symbol: newStockSymbol,
-          price: parseFloat(newStockPrice),
-        };
-        await db.collection('stocks').add(newStock);
-        // Refresh stocks list after adding
-        fetchStocks();
-        setNewStockName('');
-        setNewStockSymbol('');
-        setNewStockPrice('');
-      } catch (error) {
-        console.error('Error adding stock: ', error);
-      }
+      const newStock = {
+        id: stocks.length + 1,
+        name: newStockName,
+        symbol: newStockSymbol,
+        price: parseFloat(newStockPrice),
+      };
+      setStocks([...stocks, newStock]);
+      setNewStockName('');
+      setNewStockSymbol('');
+      setNewStockPrice('');
     }
   };
 
-  const handleEditStock = async () => {
-    if (editStockId && editStockName.trim() !== '' && editStockSymbol.trim() !== '' && editStockPrice.trim() !== '') {
-      try {
-        const stockRef = db.collection('stocks').doc(editStockId);
-        await stockRef.update({
-          name: editStockName,
-          symbol: editStockSymbol,
-          price: parseFloat(editStockPrice),
-        });
-        // Refresh stocks list after updating
-        fetchStocks();
-        setEditStockId(null);
-        setEditStockName('');
-        setEditStockSymbol('');
-        setEditStockPrice('');
-      } catch (error) {
-        console.error('Error updating stock: ', error);
-      }
+  const handleEditStock = () => {
+    if (editStockId !== null && editStockName.trim() !== '' && editStockSymbol.trim() !== '' && editStockPrice.trim() !== '') {
+      const updatedStocks = stocks.map((stock) =>
+        stock.id === editStockId ? { ...stock, name: editStockName, symbol: editStockSymbol, price: parseFloat(editStockPrice) } : stock
+      );
+      setStocks(updatedStocks);
+      setEditStockId(null);
+      setEditStockName('');
+      setEditStockSymbol('');
+      setEditStockPrice('');
     }
   };
 
-  const handleDeleteStock = async (id) => {
-    try {
-      const stockRef = db.collection('stocks').doc(id);
-      await stockRef.delete();
-      // Refresh stocks list after deletion
-      fetchStocks();
-    } catch (error) {
-      console.error('Error deleting stock: ', error);
-    }
+  const handleDeleteStock = (id) => {
+    const updatedStocks = stocks.filter((stock) => stock.id !== id);
+    setStocks(updatedStocks);
   };
 
   const handleSetEditStock = (stock) => {
