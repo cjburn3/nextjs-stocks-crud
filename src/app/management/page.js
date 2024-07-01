@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "@/utils/firebaseConfig";
+import { db } from 'firebase.config';
+import { getAllDocuments, addDocument } from '../utils/firebaseUtils';
 
 export default function Management() {
   const [stocks, setStocks] = useState([]);
@@ -18,9 +19,8 @@ export default function Management() {
   }, []);
 
   const fetchStocks = async () => {
-    const querySnapshot = await getDocs(collection(db, "stocks"));
-    const stocksData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    setStocks(stocksData);
+    const querySnapshot = await getAllDocuments(db , "stocks");
+    setStocks(querySnapshot);
   };
 
   const handleAddStock = async () => {
@@ -124,7 +124,7 @@ export default function Management() {
       </div>
       <ul className="space-y-2">
         {stocks.map((stock) => (
-          <li key={stock.id} className="flex justify-between items-center bg-gray-100 p-2 rounded-md">
+          <li key={stock.id} className="flex justify-between items-center bg-blue-300 p-2 rounded-md">
             <div>
               <p className="font-semibold">{stock.name} ({stock.symbol})</p>
               <p>Price: ${stock.price}</p>

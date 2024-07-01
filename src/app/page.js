@@ -1,16 +1,29 @@
-import React from 'react';
-import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from '../../utils/firebaseConfig';
+"use client"
+import { useState, useEffect } from 'react';
+import { addDocument, getAllDocuments } from '../app/utils/firebaseUtils';
+import { db } from 'firebase.config';
 
-const stocks = [
-  { id: 1, name: 'Apple Inc.', symbol: 'AAPL', price: 142.02 },
-  { id: 2, name: 'Microsoft Corporation', symbol: 'MSFT', price: 277.01 },
-  { id: 3, name: 'Amazon.com Inc.', symbol: 'AMZN', price: 3458.50 },
-];
 
 export default function Home() {
+
+  const [stocks, setStocks] = useState([]);;
+
+  const loadStocks = async () => {
+    const docs = await getAllDocuments(db, "stocks");
+    console.log(docs);
+    setStocks(docs);
+  }
+
+  useEffect(() => {
+
+    loadStocks();
+
+  }, [])
+
+
   return (
     <div className="container mx-auto p-4">
-    
+
       <ul className="space-y-2">
         {stocks.map((stock) => (
           <li key={stock.id} className="bg-blue-400 p-2 rounded-md">
