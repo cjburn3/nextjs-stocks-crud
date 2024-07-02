@@ -1,4 +1,5 @@
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { db } from '../firebaseConfig';
 
 /**
  * Generic that gets all documents from a firestore database and returns an array of objects
@@ -14,11 +15,8 @@ async function getAllDocuments(db, collectionName) {
   query.forEach( (doc)=>{
     documents.push( { id: doc.id, ...doc.data() } )  
   } );
-
   return documents;
-
 }
-
 
 async function addDocument(db, collectionName, data) {
   try {
@@ -29,6 +27,6 @@ async function addDocument(db, collectionName, data) {
   }
 }
 
+export { getAllDocuments, addDocument, updateDocument, deleteDocument  };
 
 
-export { getAllDocuments, addDocument };

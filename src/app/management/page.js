@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { db } from 'firebase.config';
-import { getAllDocuments, addDocument } from '../utils/firebaseUtils';
+import { getAllDocuments, addDocument, updateDocument, deleteDocument } from '../utils/firebaseUtils';
 
 export default function Management() {
   const [stocks, setStocks] = useState([]);
@@ -40,7 +40,7 @@ export default function Management() {
 
   const handleEditStock = async () => {
     if (editStockId !== null && editStockName.trim() !== '' && editStockSymbol.trim() !== '' && editStockPrice.trim() !== '') {
-      const stockRef = doc(db, "stocks", editStockId);
+      const stockRef = doc(db, "stocks", editStockId, updatedStock);
       await updateDoc(stockRef, {
         name: editStockName,
         symbol: editStockSymbol,
