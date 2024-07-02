@@ -27,6 +27,6 @@ async function addDocument(db, collectionName, data) {
   }
 }
 
-export { getAllDocuments, addDocument, updateDocument, deleteDocument  };
+export { getAllDocuments, addDoc, updateDoc, deleteDoc  };
 
 
