@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { db } from 'firebase.config';
-import { getAllDocuments, addDocument, updateDocument, deleteDocument } from '../utils/firebaseUtils';
+import { getAllDocuments, addDoc, updateDoc, deleteDoc } from '../utils/firebaseUtils';
 
 export default function Management() {
   const [stocks, setStocks] = useState([]);
