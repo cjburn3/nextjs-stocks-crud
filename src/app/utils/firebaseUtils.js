@@ -1,14 +1,16 @@
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc } from "firebase/firestore";
-import { db } from '../firebaseConfig';
+import { db } from "firebase.config";
 
-/**
- * Generic that gets all documents from a firestore database and returns an array of objects
- * @param {database instance} db
- * @param {string} collectionName
- * @returns {array}
- * @returns an array of objects
- */
-async function getAllDocuments(db, collectionName) {
+async function addDocument(db, collectionName, data) { //Create
+  try {
+    const docRef = await addDoc(collection(db, collectionName), data);
+    console.log("Document written with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+}
+
+async function getAllDocuments(db, collectionName) { //Read
   const query = await getDocs( collection(db, collectionName) )
   const documents= [];
 
@@ -18,15 +20,35 @@ async function getAllDocuments(db, collectionName) {
   return documents;
 }
 
-async function addDocument(db, collectionName, data) {
-  try {
-    const docRef = await addDoc(collection(db, collectionName), data);
-    console.log("Document written with ID: ", docRef.id);
-  } catch (e) {
-    console.error("Error adding document: ", e);
+async function updateDocument(db, collectionName, id, data){ //Update 
+
+  const updateStock = doc(db, collectionName, id);
+ 
+  if (collectionName){
+    await updateDoc(updateStock,data )
+  }else {
+    console.log("No references of doc");
   }
+
 }
 
-export { getAllDocuments, addDocument, updateDocument, deleteDocument  };
+async function deleteDocument(db, collectionName, id){ // Delete
+
+  const deleteRef = doc(db, collectionName, id);
+
+  if (deleteRef){
+    await deleteDoc(deleteRef);
+  }else {
+    console.log("Element does not exists");
+  }
+
+}
+
+
+
+
+
+
+export { getAllDocuments, addDocument, updateDocument, deleteDocument };
 
 

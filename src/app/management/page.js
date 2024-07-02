@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { db } from 'firebase.config';
-import { getAllDocuments, addDoc, updateDoc, deleteDoc } from '../utils/firebaseUtils';
+import { getAllDocuments, addDocument, deleteDocument, updateDocument } from '../utils/firebaseUtils';
 
 export default function Management() {
   const [stocks, setStocks] = useState([]);
@@ -30,22 +30,31 @@ export default function Management() {
         symbol: newStockSymbol,
         price: parseFloat(newStockPrice),
       };
-      await addDoc(collection(db, "stocks"), newStock);
+
+      const ref = await addDocument(db, "stocks", newStock) ;
+
       fetchStocks();
       setNewStockName('');
       setNewStockSymbol('');
       setNewStockPrice('');
+
+      console.log("Inserted Object");
+
+      console.log(ref);
     }
   };
 
   const handleEditStock = async () => {
     if (editStockId !== null && editStockName.trim() !== '' && editStockSymbol.trim() !== '' && editStockPrice.trim() !== '') {
-      const stockRef = doc(db, "stocks", editStockId, updatedStock);
-      await updateDoc(stockRef, {
+      
+      const dataInfo = {
         name: editStockName,
         symbol: editStockSymbol,
-        price: parseFloat(editStockPrice),
-      });
+        price: parseFloat(editStockPrice)
+      }
+
+      await updateDocument(db, "stocks", editStockId, dataInfo);
+
       fetchStocks();
       setEditStockId(null);
       setEditStockName('');
@@ -55,8 +64,7 @@ export default function Management() {
   };
 
   const handleDeleteStock = async (id) => {
-    const stockRef = doc(db, "stocks", id);
-    await deleteDoc(stockRef);
+    await deleteDocument(db, "stocks", id);
     fetchStocks();
   };
 
@@ -102,14 +110,14 @@ export default function Management() {
           value={newStockName}
           onChange={(e) => setNewStockName(e.target.value)}
           placeholder="Enter new stock name"
-          className="border rounded-md p-2 mr-2"
+          className="border rounded-md p-2 mr-2 color-black"
         />
         <input
           type="text"
           value={newStockSymbol}
           onChange={(e) => setNewStockSymbol(e.target.value)}
           placeholder="Enter new stock symbol"
-          className="border rounded-md p-2 mr-2"
+          className="border rounded-md p-2 mr-2 COLO"
         />
         <input
           type="number"
